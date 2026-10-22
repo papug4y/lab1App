@@ -1,7 +1,40 @@
 package com.example.lab1app
 
-import android.app.Activity
+import android.os.Bundle
+import androidx.appcompat.app.AppCompatActivity
+import java.io.BufferedReader
+import java.io.InputStreamReader
 
-class QuizActivity : Activity() {
+class QuizActivity : AppCompatActivity() {
 
+    private val questionList = mutableListOf<Question>()
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        setContentView(R.layout.activity_quiz)
+
+        loadQuestionsFromAssets()
+    }
+
+    private fun loadQuestionsFromAssets() {
+        try {
+            val reader = BufferedReader(InputStreamReader(assets.open("questions.txt")))
+            var line: String? = reader.readLine()
+
+            while (line != null) {
+                val parts = line.split("|")
+                if (parts.size == 6) {
+                    val questionText = parts[0]
+                    val options = listOf(parts[1], parts[2], parts[3], parts[4])
+                    val correctIndex = parts[5].toInt()
+
+                    questionList.add(Question(questionText, options, correctIndex))
+                }
+                line = reader.readLine()
+            }
+            reader.close()
+        } catch (e: Exception) {
+            e.printStackTrace()
+        }
+    }
 }
